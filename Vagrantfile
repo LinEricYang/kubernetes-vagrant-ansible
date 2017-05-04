@@ -45,12 +45,6 @@ Vagrant.configure(2) do |config|
           ansible.playbook = "provisioning/k8s-worker.yml"
         end
       end
-      # n.vm.provision :shell, path: "scripts/bootstrap_ansible.sh"
-      # if i == 1
-      #   n.vm.provision :shell, inline: "PYTHONUNBUFFERED=1 ansible-playbook /vagrant/ansible/k8s-master.yml -c local"
-      # else
-      #   n.vm.provision :shell, inline: "PYTHONUNBUFFERED=1 ansible-playbook /vagrant/ansible/k8s-worker.yml -c local"
-      # end
     end
   end
 end

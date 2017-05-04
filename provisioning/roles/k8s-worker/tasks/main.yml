@@ -1,0 +1,10 @@
+---
+- name: Kubeadm reset
+  command: "kubeadm reset"
+  tags:
+    - k8s
+
+- name: Join Kubernetes Cluster
+  command: "kubeadm join --token=2f1a31.00f66dec74fd53f3 192.168.33.11:6443"
+  tags:
+    - k8s

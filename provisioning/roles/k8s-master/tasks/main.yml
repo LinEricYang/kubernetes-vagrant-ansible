@@ -1,0 +1,20 @@
+---
+- name: Kubeadm reset
+  command: "kubeadm reset"
+  tags:
+    - k8s
+
+- name: Kubeadm init
+  command: "kubeadm init --token=2f1a31.00f66dec74fd53f3 --pod-network-cidr 10.244.0.0/16 --apiserver-advertise-address 192.168.33.11 --skip-preflight-checks=true"
+  tags:
+    - k8s
+
+- name: Apply fannel RDAC config
+  command: "kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel-rbac.yml"
+  tags:
+    - k8s
+
+- name: Apply fannel config
+  command: "kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml"
+  tags:
+    - k8s

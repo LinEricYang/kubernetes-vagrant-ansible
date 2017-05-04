@@ -1,0 +1,95 @@
+---
+- name: Ensure selinux-utils package
+  apt:
+    name: selinux-utils
+    state: latest
+
+- name: Ensure SELinux disabled
+  command: setenforce 0
+  ignore_errors: yes
+
+- name: Remove Default Host Entry
+  lineinfile:
+    dest: /etc/hosts
+    regexp: '^127\.0\.0\.1\s+k8s-node.*$'
+    state: absent
+
+- name: Ensure Hosts File
+  lineinfile:
+    dest: /etc/hosts
+    line: "{{ item.ip }} {{ item.name }}"
+  with_items:
+    - { ip: "192.168.33.11", name: "k8s-node1" }
+    - { ip: "192.168.33.12", name: "k8s-node2" }
+    - { ip: "192.168.33.13", name: "k8s-node3" }
+
+- name: Ensure Kubernetes APT Key
+  apt_key:
+    url: "https://packages.cloud.google.com/apt/doc/apt-key.gpg"
+    state: present
+  tags:
+    - k8s
+
+- name: Ensure Kubernetes Stable APT Repository
+  apt_repository:
+    repo: 'deb http://apt.kubernetes.io/ kubernetes-xenial main'
+    state: present
+    update_cache: yes
+  tags:
+    - k8s
+
+- name: Ensure Base Kubernetes
+  apt:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - docker-engine
+    - kubelet
+    - kubeadm
+    - kubectl
+    - kubernetes-cni
+  tags:
+    - k8s
+
+- name: Ensure docker.service
+  service: name=docker state=started enabled=yes
+  tags:
+    - k8s
+
+- name: Ensure kubelet.service
+  service: name=kubelet state=started enabled=yes
+  tags:
+    - k8s
+
+- name: Ensure Docker Systemd Directories
+  file:
+    path: /etc/systemd/system/docker.service.d/
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  when: proxy_needed
+
+- name: Ensure Proxy Setting for Docker Service (1)
+  lineinfile:
+    dest: /etc/systemd/system/docker.service.d/http-proxy.conf
+    create: yes
+    state: present
+    regexp: '^\[Service\]$'
+    line: "[Service]"
+  when: proxy_needed
+
+- name: Ensure Proxy Setting for Docker Service (2)
+  lineinfile:
+    dest: /etc/systemd/system/docker.service.d/http-proxy.conf
+    create: yes
+    state: present
+    regexp: 'HTTP_PROXY=.*HTTPS_PROXY=.*NO_PROXY=.*'
+    line: "Environment=\"HTTP_PROXY={{ proxy_env.HTTP_PROXY}}/\" \"HTTPS_PROXY={{ proxy_env.HTTPS_PROXY}}\" \"NO_PROXY={{ proxy_env.NO_PROXY}}\""
+  when: proxy_needed
+
+- name: Restart Docker and Kubelet Services
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: docker

@@ -1,0 +1,12 @@
+- hosts: all
+  environment: "{{ proxy_env }}"
+  become: true
+  gather_facts: False
+  pre_tasks:
+    - name: Install python for Ansible
+      raw: test -e /usr/bin/python || (export http_proxy="{{ proxy_env.http_proxy }}" && apt -y update && apt install -y python-minimal)
+      register: output
+      changed_when: output.stdout != ""
+  roles:
+    - k8s-base
+    - k8s-master

@@ -18,3 +18,8 @@
   command: "kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml"
   tags:
     - k8s
+
+- name: Install K8S dashboard
+  command: "kubectl --kubeconfig=/etc/kubernetes/admin.conf create -f https://rawgit.com/kubernetes/dashboard/master/src/deploy/kubernetes-dashboard.yaml"
+  tags:
+    - k8s

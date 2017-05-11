@@ -29,7 +29,7 @@ Vagrant.configure(2) do |config|
         ansible.verbose = "v"
         ansible.force_remote_user = true
         ansible.extra_vars = {
-          proxy_needed: if proxy then true else false end,
+          proxy_needed: if proxy != "" then true else false end,
           proxy_env: {
             http_proxy: proxy,
             https_proxy: proxy,

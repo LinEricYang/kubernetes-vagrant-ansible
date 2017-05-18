@@ -14,8 +14,32 @@
   tags:
     - k8s
 
+- name: Download fannel config
+  get_url:
+    url: https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+    dest: /tmp/kube-flannel.yml
+  tags:
+    - k8s
+
+- name: Specify network interface for flannel
+  # Specify flannel use enp0s8 network interface (for private network) instead of the default one (vagrant default NAT)
+  lineinfile:
+    path: /tmp/kube-flannel.yml
+    regexp: '^(.*"--kube-subnet-mgr") ]$'
+    line: '\1, "--iface=enp0s8" ]'
+    backrefs: yes
+  tags:
+    - k8s
+
 - name: Apply fannel config
-  command: "kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml"
+  command: "kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f /tmp/kube-flannel.yml"
+  tags:
+    - k8s
+
+- name: Remove tmp fannel config
+  file:
+    path: /tmp/kube-flannel.yml
+    state: absent
   tags:
     - k8s
 

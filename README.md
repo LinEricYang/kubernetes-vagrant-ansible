@@ -29,5 +29,5 @@ Those three machines:
 | NAME | IP ADDRESS | ROLE |
 | --- | --- | --- |
 | k8s-node1 | 192.168.33.11 | Master |
-| k8s-node2 | 192.168.33.11 | Worker |
-| k8s-node3 | 192.168.33.11 | Worker |
+| k8s-node2 | 192.168.33.12 | Worker |
+| k8s-node3 | 192.168.33.13 | Worker |
